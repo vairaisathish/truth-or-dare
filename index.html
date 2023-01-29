@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Truth or Dare Game</title>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+      .spinner {
+        border: 2px solid black;
+        border-radius: 50%;
+        width: 200px;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: spin 2s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      h1 {
+        font-size: 36px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: lightblue;
+        border: none;
+        border-radius: 10px;
+        font-size: 24px;
+        margin-top: 20px;
+      }
+      .person-selector {
+        display: none;
+      }
+      .m-pnt5 {
+        margin: 0.5rem;
+      }
+      .question {
+        display: none;
+        font-size: 24px;
+        margin-top: 20px;
+      }
+    </style>
+    <script src="questions.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Truth or Dare Game</h1>
+      <div class="spinner">
+        <p id="selectedPerson">Spin to select</p>
+      </div>
+      <button id="spinButton">Spin</button>
+      <div class="person-selector">
+        <button class="m-pnt5" id="truthButton">Truth</button>
+        <button class="m-pnt5" id="dareButton">Dare</button>
+      </div>
+
+         <p class="question" id="truthQuestion">What is your biggest secret?</p>
+         <p class="question" id="dareQuestion">Do 10 push-ups</p>
+    </div>
+    <script>
+      let choosedPerson = '';
+      let oppositePerson = ''; 
+      let lastSelectedNumbers = []
+      const spinButton = document.querySelector("#spinButton");
+      spinButton.addEventListener("click", function() {
+        selectedPerson.innerHTML = "X";
+        removeTruthAndDareQuestions();
+        setTimeout(() => {
+            const selectedPerson = document.querySelector("#selectedPerson");
+            let zeroOrOne = Math.floor(Math.random() * 2);
+           
+            if (lastSelectedNumbers.length === 2) {
+                if (lastSelectedNumbers.every(selectedNum => selectedNum === zeroOrOne)) { // if last two Numbers are same
+                    zeroOrOne = zeroOrOne === 0 ? 1 : 0
+                }
+                lastSelectedNumbers = []
+            }
+            lastSelectedNumbers.push(zeroOrOne);
+            const randomPerson = people[zeroOrOne];
+            selectedPerson.innerHTML = randomPerson;
+            choosedPerson = randomPerson;
+            oppositePerson = zeroOrOne === 0 ? people[1] : people[0];
+            const personSelector = document.querySelector(".person-selector");
+            personSelector.style.display = "flex";
+        }, 1000)
+      });
+
+      const truthButton = document.querySelector("#truthButton");
+      truthButton.addEventListener("click", function() {
+        removeTruthAndDareQuestions();
+        removeTruthAndDareButton();
+        const selectedPerson = document.querySelector("#selectedPerson");
+        selectedPerson.innerHTML = selectedPerson.innerHTML + " - Truth";
+
+        const truthQuestion = document.querySelector("#truthQuestion");
+        truthQuestion.innerHTML = replaceChoosedAndOpoositeText(generateTruth());
+        truthQuestion.style.display = "flex";
+      });
+      
+      const dareButton = document.querySelector("#dareButton");
+      dareButton.addEventListener("click", function() {
+        removeTruthAndDareQuestions();
+        removeTruthAndDareButton();
+        const selectedPerson = document.querySelector("#selectedPerson");
+        selectedPerson.innerHTML = selectedPerson.innerHTML + " - Dare";
+
+        const dareQuestion = document.querySelector("#dareQuestion");
+        dareQuestion.innerHTML = replaceChoosedAndOpoositeText(generateDare());
+        dareQuestion.style.display = "flex";
+
+      });
+
+      function removeTruthAndDareQuestions() {
+        const dareQuestion = document.querySelector("#dareQuestion");
+        dareQuestion.innerHTML = "";
+        dareQuestion.style.display = "flex";
+
+        const truthQuestion = document.querySelector("#truthQuestion");
+        truthQuestion.innerHTML = "";
+        truthQuestion.style.display = "flex";
+      }
+      function removeTruthAndDareButton() {
+        const personSelector = document.querySelector(".person-selector");
+        personSelector.style.display = "none";
+      }
+
+      const usedTruths = [];
+      const usedDares = [];
+      function generateTruth() {
+        if (truths.length === usedTruths.length) {
+            return "All Truth have been generated.";
+        } else {
+          let randomIndex = Math.floor(Math.random() * truths.length);
+          while (usedTruths.includes(randomIndex)) {
+            randomIndex = Math.floor(Math.random() * truths.length);
+          }
+          usedTruths.push(randomIndex);
+          return truths[randomIndex];
+        }
+      }
+
+      function generateDare() {
+        if (dares.length === usedDares.length) {
+            return "All Dare have been generated.";
+        } else {
+          let randomIndex = Math.floor(Math.random() * dares.length);
+          while (usedDares.includes(randomIndex)) {
+            randomIndex = Math.floor(Math.random() * dares.length);
+          }
+          usedDares.push(randomIndex);
+          return dares[randomIndex];
+        }
+      }
+
+      function replaceAll(str, find, replace) {
+         return str.replace(new RegExp(find, 'g'), replace);
+      }
+      function replaceChoosedAndOpoositeText(text) {
+          let textWithReplaced = replaceAll(text, '{{choosedPerson}}', choosedPerson);
+          return replaceAll(textWithReplaced, '{{oppositePerson}}', oppositePerson);       
+      }
+
+
+    </script>
+  </body>
+</html>
+
+
